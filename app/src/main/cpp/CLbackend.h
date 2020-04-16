@@ -24,10 +24,16 @@ public:
 
 	cl_platform_id platform ;
 	cl_context gpu_context;
-	cl_device_id *devices;
+	cl_device_id *devices = NULL;
+    size_t deviceListSize;
+	cl_kernel kernel_gradsmooth ;
+    string tmp;
+    std::string getInfo(int j)const;
+    std::string getInfoSt2(int j)const;
 
-	cl_kernel kernel_gradsmooth;
+    int init();
 
+	int iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const;
 };
 
 int cL_gradsmooth(Mat & depth_img, Mat & grad, 

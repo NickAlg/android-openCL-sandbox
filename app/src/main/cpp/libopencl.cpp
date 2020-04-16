@@ -10,7 +10,7 @@
 **/
 
 #include "libopencl.h"
-
+#include "android/log.h"
 
 #if defined(__APPLE__) || defined(__MACOSX)
 static const char *default_so_paths[] = {
@@ -20,8 +20,8 @@ static const char *default_so_paths[] = {
 #elif defined(__ANDROID__)
 static const char *default_so_paths[] = {
   "/vendor/lib64/libOpenCL.so",
-  //"/system/lib/libOpenCL.so",
-  //"/system/vendor/lib/libOpenCL.so",
+  "/system/lib/libOpenCL.so",
+  "/system/vendor/lib/libOpenCL.so",
   //"/system/vendor/lib/egl/libGLES_mali.so",
  // "/system/vendor/lib/libPVROCL.so",
   //"/data/data/org.pocl.libs/files/lib/libpocl.so",
