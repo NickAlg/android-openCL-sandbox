@@ -158,14 +158,14 @@ int CLRuntime::init() {
     if (iniKernelsgrandsmoothTest(kernel_gradsmooth) != CL_SUCCESS) {
         __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
                             "Error: Creating kernel_gradsmooth from program.(clCreateKernel)\n");
-         return EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
 
 
     return EXIT_SUCCESS;
 }
 
-int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel& kernel_gradsmooth) const {
+int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const {
     // Load kernel program, compile CL program, generate CL kernel instance
     cl_int status = CL_SUCCESS;
 
@@ -225,9 +225,18 @@ std::string CLRuntime::getInfo(int j) const {
     //Query device type
     cl_device_type dev_type;
     status = clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(cl_device_type), &dev_type, NULL);
-    snprintf(buffer, sizeof(buffer), "Device type: %lu\n", dev_type);
-    __android_log_print(ANDROID_LOG_WARN, " TODEL ", "Device type: %lu\n", dev_type);
+    snprintf(buffer, sizeof(buffer), "Device type: %lu ", dev_type);
     tmp1 += std::string(buffer);
+
+    if (dev_type == CL_DEVICE_TYPE_CPU)
+        tmp1.append("CL_DEVICE_TYPE_CPU \n");
+    else if (dev_type == CL_DEVICE_TYPE_GPU)
+        tmp1.append("CL_DEVICE_TYPE_GPU\n");
+    else if (dev_type == CL_DEVICE_TYPE_ACCELERATOR)
+        tmp1.append("CL_DEVICE_TYPE_ACCELERATOR\n");
+    else if (dev_type == CL_DEVICE_TYPE_DEFAULT)
+        tmp1.append("CL_DEVICE_TYPE_DEFAULT\n");
+
     //Query the maximum number of computing units of the device
     cl_uint UnitNum;
     status = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &UnitNum,
@@ -294,9 +303,9 @@ std::string CLRuntime::getInfo(int j) const {
 CLRuntime::~CLRuntime() {
 //    __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "***CLRuntime 0 resource released! ***\n");
     if (devices != NULL) {
-       clReleaseKernel(kernel_gradsmooth);
+        clReleaseKernel(kernel_gradsmooth);
         //release context
-       clReleaseContext(gpu_context);
+        clReleaseContext(gpu_context);
         free(devices);
     }
 
@@ -368,6 +377,20 @@ std::string CLRuntime::getInfoSt2(int jin) const {
             __android_log_print(ANDROID_LOG_WARN, " TODEL ", " %d.%d Parallel compute units: %d\n",
                                 j + 1, 4, maxComputeUnits);
 
+            cl_device_type dev_type;
+            clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(cl_device_type), &dev_type, NULL);
+
+            std::string tmp1 = std::string("   Device type: " );
+            if (dev_type == CL_DEVICE_TYPE_CPU)
+                tmp1.append("CL_DEVICE_TYPE_CPU \n");
+            else if (dev_type == CL_DEVICE_TYPE_GPU)
+                tmp1.append("CL_DEVICE_TYPE_GPU\n");
+            else if (dev_type == CL_DEVICE_TYPE_ACCELERATOR)
+                tmp1.append("CL_DEVICE_TYPE_ACCELERATOR\n");
+            else if (dev_type == CL_DEVICE_TYPE_DEFAULT)
+                tmp1.append("CL_DEVICE_TYPE_DEFAULT\n");
+            __android_log_print(ANDROID_LOG_WARN, " TODEL ", " %d.%d  %s \n",
+                                j + 1, 5, tmp1.c_str());
         }
 
         free(devices);
