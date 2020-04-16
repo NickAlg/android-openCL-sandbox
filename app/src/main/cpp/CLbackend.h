@@ -33,7 +33,7 @@ public:
 
     int init();
 
-	int iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const;
+	int iniKernelsgrandsmoothTest(cl_kernel& kernel_gradsmooth) const;
 };
 
 int cL_gradsmooth(Mat & depth_img, Mat & grad, 

@@ -6,10 +6,10 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 # opencv configuration
-set( OpenCV_ANDROID_SDK E:/opencv-4.1.1-android-sdk-omp )
+set( OpenCV_ANDROID_SDK /home/nickzt/Algo/OpenCV-android-sdk )
 set( OpenCV_DIR ${OpenCV_ANDROID_SDK}/sdk/native/jni )
-
-find_package(OpenCV REQUIRED core highgui calib3d imgproc imgcodecs features2d ximgproc photo)
+#core highgui calib3d imgproc imgcodecs features2d ximgproc photo
+find_package(OpenCV REQUIRED )
 if(OpenCV_FOUND)
     include_directories(${OpenCV_INCLUDE_DIRS})
     message(STATUS "OpenCV library status:")

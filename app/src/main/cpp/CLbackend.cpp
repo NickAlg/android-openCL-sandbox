@@ -155,26 +155,26 @@ int CLRuntime::init() {
         return EXIT_FAILURE;
     }
 
-//    if (iniKernelsgrandsmoothTest(kernel_gradsmooth) != CL_SUCCESS) {
-//        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
-//                            "Error: Creating kernel_gradsmooth from program.(clCreateKernel)\n");
-//         return EXIT_FAILURE;
-//    }
+    if (iniKernelsgrandsmoothTest(kernel_gradsmooth) != CL_SUCCESS) {
+        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+                            "Error: Creating kernel_gradsmooth from program.(clCreateKernel)\n");
+         return EXIT_FAILURE;
+    }
 
 
     return EXIT_SUCCESS;
 }
 
-int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const {
+int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel& kernel_gradsmooth) const {
     // Load kernel program, compile CL program, generate CL kernel instance
     cl_int status = CL_SUCCESS;
+
     size_t sourceSize_gradsmooth[] = {strlen(kernelSourceCode_grad_smootch)};
     cl_program program_gradsmooth = clCreateProgramWithSource(gpu_context,
                                                               1,
                                                               &kernelSourceCode_grad_smootch,
                                                               sourceSize_gradsmooth,
                                                               &status);
-
 
     if (status != CL_SUCCESS) {
         __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
@@ -185,7 +185,7 @@ int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const {
 // Compile CL program for the specified device.
     const char options[] = "-cl-single-precision-constant -cl-fast-relaxed-math";
 
-
+//    __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "***iniKernelsgrandsmoothTest 3  ***\n");
 
     //gradsmooth
     status = clBuildProgram(program_gradsmooth, 1, devices, options, NULL, NULL);
@@ -196,11 +196,6 @@ int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const {
         return EXIT_FAILURE;
     }
 
-#if DEBUG_PRINT
-//  tmp = getInfo(0);
-
-#endif
-
     // Get the handle of the kernel instance with the specified name
     kernel_gradsmooth = clCreateKernel(program_gradsmooth, "grad_smootch", &status);
     if (status != CL_SUCCESS) {
@@ -210,6 +205,7 @@ int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const {
     }
 
     status = clReleaseProgram(program_gradsmooth);
+    return EXIT_SUCCESS;
 }
 
 std::string CLRuntime::getInfo(int j) const {
@@ -296,11 +292,11 @@ std::string CLRuntime::getInfo(int j) const {
 }
 
 CLRuntime::~CLRuntime() {
+//    __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "***CLRuntime 0 resource released! ***\n");
     if (devices != NULL) {
-        if (kernel_gradsmooth) clReleaseKernel(kernel_gradsmooth);
-
+       clReleaseKernel(kernel_gradsmooth);
         //release context
-        if (gpu_context) clReleaseContext(gpu_context);
+       clReleaseContext(gpu_context);
         free(devices);
     }
 

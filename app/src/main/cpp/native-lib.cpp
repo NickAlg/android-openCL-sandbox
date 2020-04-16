@@ -22,8 +22,6 @@ Java_com_example_administrator_demo_1ndk_1opencv_MainActivity_stringFromJNI(
         __android_log_print(ANDROID_LOG_WARN, " TODEL ", "%s", hello.c_str());
         tmp->getInfoSt2(0);
 
-
-
     }
     delete tmp;
     return env->NewStringUTF(hello.c_str());
