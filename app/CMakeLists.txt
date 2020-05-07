@@ -20,6 +20,26 @@ else(OpenCV_FOUND)
     message(FATAL_ERROR "OpenCV library not found")
 endif(OpenCV_FOUND)
 
+include_directories(    ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp/include/opencl
+        ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp/include/opencl/include
+        ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp/include/opencl/include/CL
+        ${CMAKE_CURRENT_LIST_DIR}/src/main/cpp/include/opencl/opencl22)
+
+if(${ANDROID_ABI} STREQUAL arm64-v8a )
+    add_library(libcutils SHARED IMPORTED )
+    set_target_properties(libcutils PROPERTIES
+            IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libcutils.so")
+
+    add_library(libbase SHARED IMPORTED )
+    set_target_properties(libbase PROPERTIES
+            IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libbase.so")
+
+    add_library(libcpp SHARED IMPORTED )
+    set_target_properties(libcpp PROPERTIES
+            IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libc++.so")
+endif()
+
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -33,16 +53,18 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              src/main/cpp/native-lib.cpp
-             src/main/cpp/CLbackend.cpp)
+        src/main/cpp/OpenCLWrapper.h
+        src/main/cpp/OpenCLWrapper.cpp
+        src/main/cpp/CLbackend.cpp)
 
 
 include_directories(src/main/cpp/)
-add_library(OpenCL STATIC src/main/cpp/libopencl.cpp)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-    CMAKE_CXX_COMPILER_ID STREQUAL "GNU"   OR
-    CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-    target_compile_options(OpenCL PRIVATE -O2 -fPIC -Wall)
-endif()
+##add_library(OpenCL STATIC src/main/cpp/libopencl.cpp)
+#if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+#    CMAKE_CXX_COMPILER_ID STREQUAL "GNU"   OR
+#    CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+#    target_compile_options(OpenCL PRIVATE -O2 -fPIC -Wall)
+#endif()
 
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -61,14 +83,25 @@ find_library( # Sets the name of the path variable.
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
+if(ANDROID_ABI MATCHES "^armeabi(-v7a)?$")
+    target_link_libraries( # Specifies the target library.
+            native-lib
+            ${OpenCV_LIBRARIES}
+            ${log-lib})
+elseif(ANDROID_ABI STREQUAL arm64-v8a)
+    target_link_libraries( # Specifies the target library.
+            native-lib
+            ${OpenCV_LIBRARIES}
 
-target_link_libraries( # Specifies the target library.
-                       native-lib
-                       ${OpenCV_LIBRARIES}
-                       OpenCL
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
+            ${log-lib})
+endif()
+#target_link_libraries( # Specifies the target library.
+#                       native-lib
+#                       ${OpenCV_LIBRARIES}
+#                       OpenCL
+#                       # Links the target library to the log library
+#                       # included in the NDK.
+#                       ${log-lib} )
 
 # add open mp for opencv
 SET ( CMAKE_CXX_FLAGS "-fopenmp ${CMAKE_CXX_FLAGS}" )
