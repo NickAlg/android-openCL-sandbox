@@ -327,14 +327,17 @@ std::string CLRuntime::getInfoSt2(int jin) const {
 
     // get all platforms
     clGetPlatformIDs(0, NULL, &platformCount);
+
     platforms = (cl_platform_id *) malloc(sizeof(cl_platform_id) * platformCount);
     clGetPlatformIDs(platformCount, platforms, NULL);
 
+  __android_log_print(ANDROID_LOG_WARN, " TODEL ", "Platform Count%d. \n",platformCount);
     for (i = 0; i < platformCount; i++) {
 
         // get all devices
         clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &deviceCount);
         devices = (cl_device_id *) malloc(sizeof(cl_device_id) * deviceCount);
+
         clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, deviceCount, devices, NULL);
 
         // for each device print critical attributes
@@ -344,7 +347,7 @@ std::string CLRuntime::getInfoSt2(int jin) const {
             clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 0, NULL, &valueSize);
             value = (char *) malloc(valueSize);
             clGetDeviceInfo(devices[j], CL_DEVICE_NAME, valueSize, value, NULL);
-            __android_log_print(ANDROID_LOG_WARN, " TODEL ", "%d. Device: %s\n", j + 1, value);
+            __android_log_print(ANDROID_LOG_WARN, " TODEL ", "With platform %d. %d. Device: %s\n",i, j + 1, value);
             free(value);
 
             // print hardware device version
