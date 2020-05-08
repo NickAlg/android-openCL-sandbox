@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/android-ndk-demo.iml" filepath="$PROJECT_DIR$/android-ndk-demo.iml" group="android-ndk-demo" />
       <module fileurl="file://$PROJECT_DIR$/app/android-ndk-demo-app.iml" filepath="$PROJECT_DIR$/app/android-ndk-demo-app.iml" group="android-ndk-demo/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sdk/sdk.iml" filepath="$PROJECT_DIR$/sdk/sdk.iml" group="android-ndk-demo/sdk" />
     </modules>
   </component>
 </project>

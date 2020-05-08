@@ -1,8 +1,8 @@
 //
 //  OpenCLWrapper.hpp
-//  MNN
+//  NNM
 //
-//  Created by MNN on 2019/01/31.
+//  Created by NNM on 2019/01/31.
 //  Copyright © 2018, Alibaba Group Holding Limited
 //
 
@@ -11,7 +11,6 @@
 
 #include <memory>
 #include <assert.h>
-//#include "Macro.h"
 
 #define CL_TARGET_OPENCL_VERSION 200
 #define CL_HPP_TARGET_OPENCL_VERSION 110
@@ -44,7 +43,7 @@
 //        MNN_PRINT("ERROR CODE : %d \n", (int)error); \
 //    }
 
-namespace MNN {
+namespace NNM {
 
 void LoadOpenCLSymbols();
 void UnLoadOpenCLSymbols();
@@ -207,6 +206,6 @@ private:
     static std::shared_ptr<OpenCLSymbols> gOpenclSymbols;
 };
 
-} // namespace MNN
+} // namespace NNM
 
 

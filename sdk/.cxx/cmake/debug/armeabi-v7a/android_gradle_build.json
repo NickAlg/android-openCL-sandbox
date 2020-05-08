@@ -1,0 +1,42 @@
+{
+  "stringTable": {
+    "0": "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/debug/armeabi-v7a",
+    "1": "--target=armv7-none-linux-androideabi21 --gcc-toolchain=/home/nickzt/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/home/nickzt/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC"
+  },
+  "buildFiles": [
+    "/home/nickzt/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake",
+    "/home/nickzt/Android/Sdk/ndk/20.0.5594570/build/cmake/platforms.cmake",
+    "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/libcxx_helper/CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "/home/nickzt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/debug/armeabi-v7a\" clean"
+  ],
+  "buildTargetsCommand": "/home/nickzt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/debug/armeabi-v7a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "opencv_jni_shared-Debug-armeabi-v7a": {
+      "buildCommand": "/home/nickzt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/debug/armeabi-v7a\" opencv_jni_shared",
+      "buildType": "debug",
+      "toolchain": "1655617519",
+      "abi": "armeabi-v7a",
+      "artifactName": "opencv_jni_shared",
+      "files": [
+        {
+          "src": "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/libcxx_helper/dummy.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/debug/armeabi-v7a/libopencv_jni_shared.a"
+    }
+  },
+  "toolchains": {
+    "1655617519": {
+      "cppCompilerExecutable": "/home/nickzt/Android/Sdk/ndk/20.0.5594570/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

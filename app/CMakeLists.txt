@@ -6,8 +6,9 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 # opencv configuration
-set( OpenCV_ANDROID_SDK /home/nickzt/Algo/OpenCV-android-sdk )
-set( OpenCV_DIR ${OpenCV_ANDROID_SDK}/sdk/native/jni )
+set( OpenCV_ANDROID_SDK ${CMAKE_SOURCE_DIR}/../ )
+set( OpenCV_DIR ${CMAKE_SOURCE_DIR}/../sdk/native/jni)
+message(STATUS "   include OpenCV path : ${OpenCV_DIR}")
 #core highgui calib3d imgproc imgcodecs features2d ximgproc photo
 find_package(OpenCV REQUIRED )
 if(OpenCV_FOUND)
@@ -83,18 +84,25 @@ find_library( # Sets the name of the path variable.
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
-if(ANDROID_ABI MATCHES "^armeabi(-v7a)?$")
-    target_link_libraries( # Specifies the target library.
-            native-lib
-            ${OpenCV_LIBRARIES}
-            ${log-lib})
-elseif(ANDROID_ABI STREQUAL arm64-v8a)
-    target_link_libraries( # Specifies the target library.
-            native-lib
-            ${OpenCV_LIBRARIES}
+target_link_libraries( # Specifies the target library.
+        native-lib
+        ${OpenCV_LIBRARIES}
 
-            ${log-lib})
-endif()
+        ${log-lib})
+
+
+#if(ANDROID_ABI MATCHES "^armeabi(-v7a)?$")
+#    target_link_libraries( # Specifies the target library.
+#            native-lib
+#            ${OpenCV_LIBRARIES}
+#            ${log-lib})
+#elseif(ANDROID_ABI STREQUAL arm64-v8a)
+#    target_link_libraries( # Specifies the target library.
+#            native-lib
+#            ${OpenCV_LIBRARIES}
+#
+#            ${log-lib})
+#endif()
 #target_link_libraries( # Specifies the target library.
 #                       native-lib
 #                       ${OpenCV_LIBRARIES}

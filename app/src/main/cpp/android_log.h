@@ -12,7 +12,7 @@
 #define LOG(LEVEL,x...) do { \
   char buf[512]; \
   sprintf(buf, x); \
-  __android_log_print(LEVEL,LOG_TAG, "%s:%i| %s",  __FILE__, __LINE__,  buf); \
+  __android_log_print(LEVEL,LOG_TAG, "%s:%i : %s",  __FILE__, __LINE__,  buf); \
 } while (0)
 
 # define LOG_W2(LEVEL , fmt ,...) \
@@ -22,16 +22,16 @@ __PRETTY_FUNCTION__ , ## __VA_ARGS__ )
 #define LOGD(x...) do { \
   char buf[512]; \
   sprintf(buf, x); \
-  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG, "%s:%i| %s",  __FILE__, __LINE__,  buf); \
+  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG, "%s:%i : %s",  __FILE__, __LINE__,  buf); \
 } while (0)
 #define LOGW(x...) do { \
   char buf[512]; \
   sprintf(buf, x); \
-  __android_log_print(ANDROID_LOG_WARN,LOG_TAG, "%s:%i| %s",  __FILE__, __LINE__,  buf); \
+  __android_log_print(ANDROID_LOG_WARN,LOG_TAG, "%s:%i : %s",  __FILE__, __LINE__,  buf); \
 } while (0)
 #define LOGE(x...) do { \
   char buf[512]; \
   sprintf(buf, x); \
-  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG, "%s:%i| %s",  __FILE__, __LINE__,  buf); \
+  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG, "%s:%i : %s",  __FILE__, __LINE__,  buf); \
 } while (0)
 #endif //ANDROID_NDK_DEMO_APP_SRC_MAIN_CPP_ANDROID_LOG_H_

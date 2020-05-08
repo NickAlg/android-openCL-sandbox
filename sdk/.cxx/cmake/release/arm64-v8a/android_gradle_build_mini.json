@@ -1,0 +1,19 @@
+{
+  "buildFiles": [
+    "/home/nickzt/Android/Sdk/ndk/20.0.5594570/build/cmake/android.toolchain.cmake",
+    "/home/nickzt/Android/Sdk/ndk/20.0.5594570/build/cmake/platforms.cmake",
+    "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/libcxx_helper/CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "/home/nickzt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/release/arm64-v8a\" clean"
+  ],
+  "buildTargetsCommand": "/home/nickzt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/release/arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "opencv_jni_shared-Release-arm64-v8a": {
+      "artifactName": "opencv_jni_shared",
+      "buildCommand": "/home/nickzt/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/release/arm64-v8a\" opencv_jni_shared",
+      "abi": "arm64-v8a",
+      "output": "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/release/arm64-v8a/libopencv_jni_shared.a"
+    }
+  }
+}

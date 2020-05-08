@@ -1,19 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="#000000"
+    android:backgroundTint="#000000"
+    android:orientation="vertical"
+    tools:context="com.example.administrator.openclsandbox.MainActivity">
 
-    <TextView
-        android:id="@+id/sample_text"
-        android:layout_width="wrap_content"
+    <org.opencv.android.JavaCameraView
+        android:id="@+id/main_surface"
+        android:layout_width="match_parent"
+        android:layout_height="629dp"
+        android:layout_above="@+id/btn_takepicture"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="6dp" />
+
+    <Button
+        android:id="@+id/btn_takepicture"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/custom_button" />
+
+    <Button
+        android:id="@+id/btn_info"
+        android:layout_width="62dp"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="66dp"
+        android:layout_marginBottom="26dp"
+        android:layout_toStartOf="@+id/btn_takepicture"
+        android:background="@drawable/custom_button1"
+        android:text="@string/string_information"
+        android:textColor="#9C27B0" />
 
-</android.support.constraint.ConstraintLayout>
+
+</RelativeLayout>

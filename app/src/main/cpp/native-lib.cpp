@@ -9,7 +9,7 @@
 extern "C" JNIEXPORT jstring
 
 JNICALL
-Java_com_example_administrator_demo_1ndk_1opencv_MainActivity_stringFromJNI(
+Java_com_example_administrator_openclsandbox_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     CLRuntime *tmp = new CLRuntime();
@@ -28,4 +28,16 @@ Java_com_example_administrator_demo_1ndk_1opencv_MainActivity_stringFromJNI(
     } else hello = std::string(" No Cl found in this system");
     delete tmp;
     return env->NewStringUTF(hello.c_str());
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_administrator_openclsandbox_MainActivity_coreFiltering(JNIEnv *env,
+                                                                        jobject thiz,
+                                                                        jlong mat_gray,
+                                                                        jint flag) {
+  // TODO: implement coreFiltering()
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_administrator_openclsandbox_MainActivity_initCL(JNIEnv *env, jobject thiz) {
+  // TODO: implement initCL()
 }
