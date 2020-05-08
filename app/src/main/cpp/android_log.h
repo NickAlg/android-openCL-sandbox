@@ -9,15 +9,15 @@
 
 #define LOG_TAG "OPENCLTST "
 
-#define LOG(LOGT,x...) do { \
+#define LOG(LEVEL,x...) do { \
   char buf[512]; \
   sprintf(buf, x); \
-  __android_log_print(LOGT,LOG_TAG, "%s:%i| %s",  __FILE__, __LINE__,  buf); \
+  __android_log_print(LEVEL,LOG_TAG, "%s:%i| %s",  __FILE__, __LINE__,  buf); \
 } while (0)
 
-# define LOG_W2 ( level , fmt ,...) \
-__android_log_print ( level , LOG_TAG , " (% s :% u ) %s: " fmt , \
-__FILE__ , __LINE__ , __PRETTY_FUNCTION__ , ## __VA_ARGS__ )
+# define LOG_W2(LEVEL , fmt ,...) \
+__android_log_print ( LEVEL , LOG_TAG , " (% s :% u ) %s: " fmt , __FILE__ , __LINE__ ,\
+__PRETTY_FUNCTION__ , ## __VA_ARGS__ )
 
 #define LOGD(x...) do { \
   char buf[512]; \

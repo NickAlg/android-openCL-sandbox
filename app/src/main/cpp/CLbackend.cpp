@@ -1,5 +1,6 @@
 #include <android/log.h>
 #include "CLbackend.h"
+#include "android_log.h"
 
 #define DEBUG_PRINT 1
 #define DEBUG_TIME 0
@@ -70,44 +71,128 @@ const char *kernelSourceCode_grad_smootch = KERNEL(
 CLRuntime::CLRuntime() {
 
 }
+std::stringstream CLRuntime::getStringstream(char *info,
+                                             cl_uint nPlatform,
+                                             cl_platform_id *listPlatform,
+                                             cl_uint &nDevice,
+                                             cl_device_id *listDevice) {
+    std::stringstream ret_inf;
+    for (int i = 0; i < nPlatform; i++) {
+        clGetPlatformInfo(listPlatform[i], CL_PLATFORM_NAME, 1024, info, NULL);
+        LOGD("Platfom[%d]:\n\tName\t\t%s", i, info);
+        ret_inf << info;
 
+        clGetPlatformInfo(listPlatform[i], CL_PLATFORM_VERSION, 1024, info, NULL);
+        LOGD("\n\tVersion\t\t%s", info);
+        clGetPlatformInfo(listPlatform[i], CL_PLATFORM_VENDOR, 1024, info, NULL);
+        LOGD("\n\tVendor\t\t%s", info);
+        clGetPlatformInfo(listPlatform[i], CL_PLATFORM_PROFILE, 1024, info, NULL);
+        LOGD("\n\tProfile\t\t%s", info);
+        clGetPlatformInfo(listPlatform[i], CL_PLATFORM_EXTENSIONS, 1024, info, NULL);
+        LOGD("\n\tExtension\t%s", info);
+        ret_inf << info;
+
+        clGetDeviceIDs(listPlatform[i], CL_DEVICE_TYPE_ALL, 0, NULL, &nDevice);
+        listDevice = (cl_device_id *) malloc(nDevice * sizeof(cl_device_id));
+        clGetDeviceIDs(listPlatform[i], CL_DEVICE_TYPE_ALL, nDevice, listDevice, NULL);
+
+        for (int j = 0; j < nDevice; j++) {
+//      LOGD("\n");
+            clGetDeviceInfo(listDevice[j], CL_DEVICE_NAME, 1024, info, NULL);
+            LOGD("\n\tDevice[%d]:\n\tName\t\t%s", j, info);
+            ret_inf << info;
+            clGetDeviceInfo(listDevice[j], CL_DEVICE_VERSION, 1024, info, NULL);
+            LOGD("\n\tVersion\t\t%s", info);
+            ret_inf << info;
+            clGetDeviceInfo(listDevice[j], CL_DEVICE_TYPE, 1024, info, NULL);
+            switch (info[0]) {
+                case CL_DEVICE_TYPE_DEFAULT:strcpy(info, "DEFAULT");
+                break;
+                case CL_DEVICE_TYPE_CPU:strcpy(info, "CPU");
+                break;
+                case CL_DEVICE_TYPE_GPU:strcpy(info, "GPU");
+                break;
+                case CL_DEVICE_TYPE_ACCELERATOR:strcpy(info, "ACCELERATOR");
+                break;
+                case CL_DEVICE_TYPE_CUSTOM:strcpy(info, "CUSTOM");
+                break;
+                case CL_DEVICE_TYPE_ALL:strcpy(info, "ALL");
+                break;
+            }
+            LOGD("\n\tType\t\t%s", info);
+            ret_inf << info;
+
+            cl_device_svm_capabilities svm;
+            clGetDeviceInfo(listDevice[j],
+                            CL_DEVICE_VERSION,
+                            sizeof(cl_device_svm_capabilities),
+                            &svm,
+                            NULL);
+            info[0] = '\0';
+            if (svm & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER) {
+                strcat(info, "COARSE_GRAIN_BUFFER ");
+            }
+            if (svm & CL_DEVICE_SVM_FINE_GRAIN_BUFFER) {
+                strcat(info, "FINE_GRAIN_BUFFER ");
+            }
+            if (svm & CL_DEVICE_SVM_FINE_GRAIN_SYSTEM) {
+                strcat(info, "FINE_GRAIN_SYSTEM ");
+            }
+            if (svm & CL_DEVICE_SVM_ATOMICS) {
+                strcat(info, "ATOMICS");
+            }
+            LOGD("\n\tSVM\t\t%s", info);
+            ret_inf << info;
+        }
+        printf("\n\n");
+        free(listDevice);
+    }
+    return ret_inf;
+}
 int CLRuntime::init() {
     long t1, t2;
+    char info[1024];
 
     cl_int status = CL_SUCCESS;
-
+    MNN::OpenCLSymbolsOperator::createOpenCLSymbolsOperatorSingleInstance();
+    if (nullptr == MNN::OpenCLSymbolsOperator::getOpenclSymbolsPtr()) {
+        LOGD("OpenCL init error , callback ...");
+        return EXIT_FAILURE;
+    } else {
+        LOGD("OpenCL init ok");
+    }
 
     // Get opencl available platforms, currently ARM
-    cl_uint numPlatforms;
+    //auto ret_inf = getStringstream( info, nPlatform, listPlatforms, nDevice, listDevice);
 
-    status = clGetPlatformIDs(0, NULL, &numPlatforms);
+    status = clGetPlatformIDs(0, NULL, &nPlatform);
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "Error: Getting Platforms\n");
+        LOGE( "Error: Getting Platforms\n");
         return EXIT_FAILURE;
     }
 
-    if (numPlatforms > 0) {
+    if (nPlatform > 0) {
         cl_platform_id *platforms = (cl_platform_id *) malloc(
-                numPlatforms * sizeof(cl_platform_id));
-        status = clGetPlatformIDs(numPlatforms, platforms, NULL);
+                nPlatform * sizeof(cl_platform_id));
+        status = clGetPlatformIDs(nPlatform, platforms, NULL);
         if (status != CL_SUCCESS) {
-            __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+            LOGE(
                                 "Error: Getting Platform Ids.(clGetPlatformIDs)\n");
             return EXIT_FAILURE;
         }
 
-        platform = platforms[0];
+        listPlatform = platforms[0];
         free(platforms);
     }
 
     // If we can find the corresponding platform, use it, otherwise return NULL
     cl_context_properties cps[3] = {
             CL_CONTEXT_PLATFORM,
-            (cl_context_properties) platform,
+            (cl_context_properties) listPlatform,
             0
     };
 
-    cl_context_properties *cprops = (NULL == platform) ? NULL : cps;
+    cl_context_properties *cprops = (NULL == listPlatform) ? NULL : cps;
 
 
     //Generate context
@@ -118,7 +203,7 @@ int CLRuntime::init() {
             NULL,
             &status);
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Creating Context.(clCreateContexFromType)\n");
         return EXIT_FAILURE;
     }
@@ -132,14 +217,14 @@ int CLRuntime::init() {
                               NULL,
                               &deviceListSize);
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Getting Context Info device list size, clGetContextInfo)\n");
         return EXIT_FAILURE;
     }
 
-    devices = (cl_device_id *) malloc(sizeof(cl_device_id) * deviceListSize);
-    if (devices == NULL) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "Error: No devices found.\n");
+    listDevice = (cl_device_id *) malloc(sizeof(cl_device_id) * deviceListSize);
+    if (listDevice == NULL) {
+        LOGE( "Error: No listDevice found.\n");
         return EXIT_FAILURE;
     }
 
@@ -147,16 +232,16 @@ int CLRuntime::init() {
     status = clGetContextInfo(gpu_context,
                               CL_CONTEXT_DEVICES,
                               deviceListSize,
-                              devices,
+                              listDevice,
                               NULL);
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Getting Context Info (device list, clGetContextInfo)\n");
         return EXIT_FAILURE;
     }
 
     if (iniKernelsgrandsmoothTest(kernel_gradsmooth) != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Creating kernel_gradsmooth from program.(clCreateKernel)\n");
         return EXIT_FAILURE;
     }
@@ -177,7 +262,7 @@ int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const {
                                                               &status);
 
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Loading Binary into cl_program (clCreateProgramWithBinary)\n");
         return EXIT_FAILURE;
     }
@@ -185,12 +270,12 @@ int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const {
 // Compile CL program for the specified device.
     const char options[] = "-cl-single-precision-constant -cl-fast-relaxed-math";
 
-//    __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "***iniKernelsgrandsmoothTest 3  ***\n");
+//    LOGE( "***iniKernelsgrandsmoothTest 3  ***\n");
 
     //gradsmooth
-    status = clBuildProgram(program_gradsmooth, 1, devices, options, NULL, NULL);
+    status = clBuildProgram(program_gradsmooth, 1, listDevice, options, NULL, NULL);
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Building program_gradsmooth (clBuildingProgram) err_code:%d \n",
                             status);
         return EXIT_FAILURE;
@@ -199,7 +284,7 @@ int CLRuntime::iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const {
     // Get the handle of the kernel instance with the specified name
     kernel_gradsmooth = clCreateKernel(program_gradsmooth, "grad_smootch", &status);
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Creating kernel_gradsmooth from program.(clCreateKernel)\n");
         return EXIT_FAILURE;
     }
@@ -213,18 +298,18 @@ std::string CLRuntime::getInfo(int j) const {
     string tmp1;
     char buffer[210];
     snprintf(buffer, sizeof(buffer), "num of GPU device find from context: %d \n", deviceListSize);
-    __android_log_print(ANDROID_LOG_WARN, " TODEL ", "num of GPU device find from context: %d \n",
+    LOGW( "num of GPU device find from context: %d \n",
                         deviceListSize);
     tmp1.append(std::string(buffer));
     //Query the name of the device
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 100, buffer, NULL);
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_NAME, 100, buffer, NULL);
     snprintf(buffer, sizeof(buffer), " Device Name:%s \n", buffer);
-    __android_log_print(ANDROID_LOG_WARN, " TODEL ", " Device Name:%s \n", buffer);
+    LOGW( " Device Name:%s \n", buffer);
     tmp1.append(std::string(buffer));
 
     //Query device type
     cl_device_type dev_type;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(cl_device_type), &dev_type, NULL);
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_TYPE, sizeof(cl_device_type), &dev_type, NULL);
     snprintf(buffer, sizeof(buffer), "Device type: %lu ", dev_type);
     tmp1 += std::string(buffer);
 
@@ -239,20 +324,20 @@ std::string CLRuntime::getInfo(int j) const {
 
     //Query the maximum number of computing units of the device
     cl_uint UnitNum;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &UnitNum,
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &UnitNum,
                              NULL);
 
     snprintf(buffer, sizeof(buffer), "Compute Units Number: %d\n", UnitNum);
     tmp1.append(std::string(buffer));
     //Query device core frequency
     cl_uint frequency;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(cl_uint), &frequency,
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(cl_uint), &frequency,
                              NULL);
     snprintf(buffer, sizeof(buffer), "Device Frequency: %d(MHz)\n", frequency);
     tmp1.append(std::string(buffer));
     // Query device global memory size
     cl_ulong GlobalSize;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &GlobalSize,
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &GlobalSize,
                              NULL);
     snprintf(buffer, sizeof(buffer), "Device Global Mem Size: %0.0f(MB)\n",
              (float) GlobalSize / 1024 / 1024);
@@ -260,25 +345,25 @@ std::string CLRuntime::getInfo(int j) const {
     tmp1.append(std::string(buffer));
     //Query device global memory cache line
     cl_uint GlobalCacheLine;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(cl_uint),
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(cl_uint),
                              &GlobalCacheLine, NULL);
     snprintf(buffer, sizeof(buffer), "Device Global Mem CacheLine: %d(Byte)\n", GlobalCacheLine);
     tmp1.append(std::string(buffer));
     //Query the largest working group of equipment
     cl_ulong GlobalWGSize;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(cl_ulong),
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(cl_ulong),
                              &GlobalWGSize, NULL);
     snprintf(buffer, sizeof(buffer), "Device Global MAX_WORK_GROUP Size: %lu\n", GlobalWGSize);
     tmp1.append(std::string(buffer));
     //Query the largest working group of equipment
     cl_ulong GlobalWISize;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(cl_ulong),
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(cl_ulong),
                              &GlobalWISize, NULL);
     snprintf(buffer, sizeof(buffer), "Device Global MAX_WORK_ITEM Size: %lu\n", GlobalWISize);
     tmp1.append(std::string(buffer));
 
     cl_ulong LOCAL_MEM_SIZE;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_LOCAL_MEM_SIZE, sizeof(cl_ulong),
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_LOCAL_MEM_SIZE, sizeof(cl_ulong),
                              &LOCAL_MEM_SIZE, NULL);
     snprintf(buffer, sizeof(buffer), "Device Global LOCAL_MEM_SIZE Size: %0.0f(KB)\n",
              (float) LOCAL_MEM_SIZE / 1024);
@@ -286,31 +371,31 @@ std::string CLRuntime::getInfo(int j) const {
 
     //Query the OpenCL version supported by the device
     char DeviceVersion[110];
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, 100, DeviceVersion, NULL);
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_VERSION, 100, DeviceVersion, NULL);
     snprintf(buffer, sizeof(buffer), "Device Version:%s\n", DeviceVersion);
     tmp1.append(std::string(buffer));
     //Query device extension
     char *DeviceExtensions;
     size_t ExtenNum;
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, NULL, &ExtenNum);
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_EXTENSIONS, 0, NULL, &ExtenNum);
     DeviceExtensions = (char *) malloc(ExtenNum);
-    status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, ExtenNum, DeviceExtensions, NULL);
+    status = clGetDeviceInfo(listDevice[j], CL_DEVICE_EXTENSIONS, ExtenNum, DeviceExtensions, NULL);
     snprintf(buffer, sizeof(buffer), "Device Extensions: %s\n", DeviceExtensions);
     tmp1.append(std::string(buffer));
     return tmp1;
 }
 
 CLRuntime::~CLRuntime() {
-//    __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "***CLRuntime 0 resource released! ***\n");
-    if (devices != NULL) {
+//    LOGE( "***CLRuntime 0 resource released! ***\n");
+    if (listDevice != NULL) {
         clReleaseKernel(kernel_gradsmooth);
         //release context
         clReleaseContext(gpu_context);
-        free(devices);
+        free(listDevice);
     }
 
 #if DEBUG_PRINT
-    __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "***CLRuntime resource released! ***\n");
+    LOGE( "***CLRuntime resource released! ***\n");
 #endif
 }
 
@@ -331,7 +416,7 @@ std::string CLRuntime::getInfoSt2(int jin) const {
     platforms = (cl_platform_id *) malloc(sizeof(cl_platform_id) * platformCount);
     clGetPlatformIDs(platformCount, platforms, NULL);
 
-  __android_log_print(ANDROID_LOG_WARN, " TODEL ", "Platform Count%d. \n",platformCount);
+  LOGW( "Platform Count %d. \n",platformCount);
     for (i = 0; i < platformCount; i++) {
 
         // get all devices
@@ -347,14 +432,14 @@ std::string CLRuntime::getInfoSt2(int jin) const {
             clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 0, NULL, &valueSize);
             value = (char *) malloc(valueSize);
             clGetDeviceInfo(devices[j], CL_DEVICE_NAME, valueSize, value, NULL);
-            __android_log_print(ANDROID_LOG_WARN, " TODEL ", "With platform %d. %d. Device: %s\n",i, j + 1, value);
+            LOGW( "With platform %d. %d. Device: %s\n",i, j + 1, value);
             free(value);
 
             // print hardware device version
             clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, 0, NULL, &valueSize);
             value = (char *) malloc(valueSize);
             clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, valueSize, value, NULL);
-            __android_log_print(ANDROID_LOG_WARN, " TODEL ", " %d.%d Hardware version: %s\n", j + 1,
+            LOGW( " %d.%d Hardware version: %s\n", j + 1,
                                 1, value);
             free(value);
 
@@ -362,7 +447,7 @@ std::string CLRuntime::getInfoSt2(int jin) const {
             clGetDeviceInfo(devices[j], CL_DRIVER_VERSION, 0, NULL, &valueSize);
             value = (char *) malloc(valueSize);
             clGetDeviceInfo(devices[j], CL_DRIVER_VERSION, valueSize, value, NULL);
-            __android_log_print(ANDROID_LOG_WARN, " TODEL ", " %d.%d Software version: %s\n", j + 1,
+            LOGW( " %d.%d Software version: %s\n", j + 1,
                                 2, value);
             free(value);
 
@@ -370,14 +455,14 @@ std::string CLRuntime::getInfoSt2(int jin) const {
             clGetDeviceInfo(devices[j], CL_DEVICE_OPENCL_C_VERSION, 0, NULL, &valueSize);
             value = (char *) malloc(valueSize);
             clGetDeviceInfo(devices[j], CL_DEVICE_OPENCL_C_VERSION, valueSize, value, NULL);
-            __android_log_print(ANDROID_LOG_WARN, " TODEL ", " %d.%d OpenCL C version: %s\n", j + 1,
+            LOGW( " %d.%d OpenCL C version: %s\n", j + 1,
                                 3, value);
             free(value);
 
             // print parallel compute units
             clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS,
                             sizeof(maxComputeUnits), &maxComputeUnits, NULL);
-            __android_log_print(ANDROID_LOG_WARN, " TODEL ", " %d.%d Parallel compute units: %d\n",
+            LOGW( " %d.%d Parallel compute units: %d\n",
                                 j + 1, 4, maxComputeUnits);
 
             cl_device_type dev_type;
@@ -392,7 +477,7 @@ std::string CLRuntime::getInfoSt2(int jin) const {
                 tmp1.append("CL_DEVICE_TYPE_ACCELERATOR\n");
             else if (dev_type == CL_DEVICE_TYPE_DEFAULT)
                 tmp1.append("CL_DEVICE_TYPE_DEFAULT\n");
-            __android_log_print(ANDROID_LOG_WARN, " TODEL ", " %d.%d  %s \n",
+            LOGW( " %d.%d  %s \n",
                                 j + 1, 5, tmp1.c_str());
         }
 
@@ -459,7 +544,7 @@ int cL_gradsmooth(Mat &depth_img, Mat &grad,
 #endif
 
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Create Buffer, outputBuffer. (clCreateBuffer)\n");
     }
 
@@ -480,13 +565,13 @@ int cL_gradsmooth(Mat &depth_img, Mat &grad,
 
     //t1 = getCPUTickCount();
     cl_command_queue commandQueue = clCreateCommandQueue(bok_cl_runtime.gpu_context,
-                                                         bok_cl_runtime.devices[0],
+                                                         bok_cl_runtime.listDevice[0],
                                                          0,
                                                          &status);
     //t2 = getCPUTickCount();
     //cout << "clCreateCommandQueue takes: " << (t2 - t1) * 1000 / getTickFrequency() << endl;
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ",
+        LOGE(
                             "Error: Create Command Queue. (clCreateCommandQueue)\n");
     }
 
@@ -502,13 +587,13 @@ int cL_gradsmooth(Mat &depth_img, Mat &grad,
                                     NULL, 0,
                                     NULL, NULL);
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "Error: Enqueueing kernel err_code:%d \n",
+        LOGE( "Error: Enqueueing kernel err_code:%d \n",
                             status);
     }
 
     status = clFinish(commandQueue);
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "Error: Finish command queue\n");
+        LOGE( "Error: Finish command queue\n");
     }
 
 #if DEBUG_TIME
@@ -529,7 +614,7 @@ int cL_gradsmooth(Mat &depth_img, Mat &grad,
 #endif
 
     if (status != CL_SUCCESS) {
-        __android_log_print(ANDROID_LOG_ERROR, " TODEL ", "Error: Read buffer queue err_code:%d \n",
+        LOGE( "Error: Read buffer queue err_code:%d \n",
                             status);
     }
 
