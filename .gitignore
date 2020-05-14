@@ -45,8 +45,8 @@ captures/
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.
-#*.jks
-#*.keystore
+*.jks
+*.keystore
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
@@ -77,3 +77,11 @@ lint/tmp/
 # lint/reports/
 /.idea/
 /gradle/
+
+.idea
+
+
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+

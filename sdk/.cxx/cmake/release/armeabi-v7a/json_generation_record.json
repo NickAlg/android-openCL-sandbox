@@ -37,13 +37,19 @@
   },
   {
     "level": "INFO",
-    "message": "- command changed from previous, will remove stale json folder",
+    "message": "- expected json /home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/release/armeabi-v7a/android_gradle_build.json file is not present, will remove stale json folder",
     "file": "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/libcxx_helper/CMakeLists.txt",
     "tag": "release|armeabi-v7a"
   },
   {
     "level": "INFO",
-    "message": "removing stale contents from \u0027/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/release/armeabi-v7a\u0027",
+    "message": "- missing previous command file /home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/.cxx/cmake/release/armeabi-v7a/build_command.txt, will remove stale json folder",
+    "file": "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/libcxx_helper/CMakeLists.txt",
+    "tag": "release|armeabi-v7a"
+  },
+  {
+    "level": "INFO",
+    "message": "- command changed from previous, will remove stale json folder",
     "file": "/home/nickzt/Algo/OpenCl_WRK/android-ndk-demo/sdk/libcxx_helper/CMakeLists.txt",
     "tag": "release|armeabi-v7a"
   },

@@ -36,12 +36,12 @@ class CLRuntime {
 
   int iniKernelsgrandsmoothTest(cl_kernel &kernel_gradsmooth) const;
   std::stringstream getStringstream(
-		  char *info,
-		  cl_uint nPlatform,
-		  cl_platform_id  *listPlatform,
-		  cl_uint &nDevice,
-		  cl_device_id *listDevice);
-  std::string getCLDeviceName(int i, int j, cl_device_id  device) const;
+      char *info,
+      cl_uint nPlatform,
+      cl_platform_id *listPlatform,
+      cl_uint &nDevice,
+      cl_device_id *listDevice);
+  std::string getCLDeviceName(int i, int j, cl_device_id device) const;
 };
 
 int cL_gradsmooth(Mat &depth_img, Mat &grad,

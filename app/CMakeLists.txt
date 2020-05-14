@@ -56,7 +56,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/native-lib.cpp
         src/main/cpp/OpenCLWrapper.h
         src/main/cpp/OpenCLWrapper.cpp
-        src/main/cpp/CLbackend.cpp)
+       )
 
 
 include_directories(src/main/cpp/)
