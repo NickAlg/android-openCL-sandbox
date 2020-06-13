@@ -1,5 +1,5 @@
 {
-  "ndkFolder": "/home/nickzt/Android/Sdk/ndk/20.0.5594570",
+  "ndkFolder": "/home/nickzt/Android/Sdk/ndk/21.2.6472646",
   "messages": [
     {
       "level": "INFO",
@@ -7,7 +7,7 @@
     },
     {
       "level": "INFO",
-      "message": "ndk.dir in local.properties is /home/nickzt/Android/Sdk/ndk/20.0.5594570"
+      "message": "ndk.dir in local.properties is /home/nickzt/Android/Sdk/ndk/21.2.6472646"
     },
     {
       "level": "INFO",
@@ -19,7 +19,7 @@
     },
     {
       "level": "INFO",
-      "message": "Considering /home/nickzt/Android/Sdk/ndk/20.0.5594570 by ndk.dir"
+      "message": "Considering /home/nickzt/Android/Sdk/ndk/21.2.6472646 by ndk.dir"
     },
     {
       "level": "INFO",
@@ -27,11 +27,11 @@
     },
     {
       "level": "INFO",
-      "message": "Considering /home/nickzt/Android/Sdk/ndk/20.0.5594570 in SDK ndk folder"
+      "message": "Considering /home/nickzt/Android/Sdk/ndk/21.2.6472646 in SDK ndk folder"
     },
     {
       "level": "INFO",
-      "message": "Found requested ndk.dir (/home/nickzt/Android/Sdk/ndk/20.0.5594570) which has version 20.0.5594570"
+      "message": "Found requested ndk.dir (/home/nickzt/Android/Sdk/ndk/21.2.6472646) which has version 21.2.6472646"
     }
   ]
 }

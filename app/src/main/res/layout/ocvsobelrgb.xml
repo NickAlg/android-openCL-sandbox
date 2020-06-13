@@ -4,15 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
     android:background="#000000"
     android:backgroundTint="#000000"
     android:orientation="vertical"
-    tools:context="com.example.administrator.openclsandbox.MainActivity">
+    tools:context="zt.mezon.graphomany.openclsandbox.MainActivity">
 
     <org.opencv.android.JavaCameraView
         android:id="@+id/main_surface"
-        android:layout_width="match_parent"
-        android:layout_height="629dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone"
+        opencv:show_fps="true"
+        opencv:camera_id="front"
+        android:screenOrientation="reverseLandscape"
         android:layout_above="@+id/btn_takepicture"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="6dp" />

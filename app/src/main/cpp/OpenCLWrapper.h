@@ -6,17 +6,18 @@
 #include <assert.h>
 
 #define CL_TARGET_OPENCL_VERSION 200
-#define CL_HPP_TARGET_OPENCL_VERSION 110
-#define CL_HPP_MINIMUM_OPENCL_VERSION 110
+#define CL_HPP_TARGET_OPENCL_VERSION 120
+#define CL_HPP_MINIMUM_OPENCL_VERSION 120
 
-#include <android/log.h>
-#define MNN_ERROR(format, ...) __android_log_print(ANDROID_LOG_ERROR, "MNNJNI", format, ##__VA_ARGS__)
+#include <android_log.h>
+
+#define LOG_TAG " CLWRAPP "
 
 #define MNN_ASSERT(x)                                            \
     {                                                            \
         int res = (x);                                           \
         if (!res) {                                              \
-            MNN_ERROR("Error for %s, %d\n", __FILE__, __LINE__); \
+             LOGE("Error for %s, %d\n", __FILE__, __LINE__); \
             assert(res);                                         \
         }                                                        \
     }
@@ -31,10 +32,7 @@
 
 #define MNN_CHECK_NOTNULL(X) MNN_ASSERT(X != NULL)
 
-//#define MNN_CHECK_CL_SUCCESS(error)                  \
-//    if (error != CL_SUCCESS) {                       \
-//        MNN_PRINT("ERROR CODE : %d \n", (int)error); \
-//    }
+
 
 namespace NNM {
 

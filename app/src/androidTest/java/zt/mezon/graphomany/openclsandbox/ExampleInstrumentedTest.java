@@ -1,4 +1,4 @@
-package com.example.administrator.openclsandbox;
+package zt.mezon.graphomany.openclsandbox;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.administrator.openclsandbox", appContext.getPackageName());
+        assertEquals("com.mezon.graphomany.openclsandbox", appContext.getPackageName());
     }
 }

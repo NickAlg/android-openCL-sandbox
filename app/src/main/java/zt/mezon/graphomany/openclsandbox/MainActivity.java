@@ -1,4 +1,4 @@
-package com.example.administrator.openclsandbox;
+package zt.mezon.graphomany.openclsandbox;
 
 import android.Manifest;
 import android.app.Activity;
@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.don11995.log.SimpleLog;
+import zt.mezon.graphomany.openclsandbox.R;
 
 import org.jetbrains.annotations.NotNull;
 import org.opencv.android.BaseLoaderCallback;
@@ -19,6 +20,7 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
 import androidx.core.app.ActivityCompat;
@@ -33,6 +35,9 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         System.loadLibrary("native-lib");
     }
 
+    Mat mRgba;
+    Mat mRgbaF;
+    Mat mRgbaT;
     private CameraBridgeViewBase mOpenCvCameraView;
     private Mat curFrame_gray;
     private Mat curFrame_rgba;
@@ -72,7 +77,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
                 CAMERA_PERMISSION_REQUEST
         );
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.ocvsobelrgb);
 
         SimpleLog.enableAllLogs();
         SimpleLog.setPrintReferences(true);
@@ -152,8 +157,11 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     //
     @Override
     public void onCameraViewStarted(int width, int height) {
-        initCL();
+        initCL( width,  height);
         SimpleLog.i("OpenCL is initialized");
+        mRgba = new Mat(height, width, CvType.CV_8UC4);
+        mRgbaF = new Mat(height, width, CvType.CV_8UC4);
+        mRgbaT = new Mat(width, width, CvType.CV_8UC4);
 
     }
 
@@ -163,14 +171,18 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     //
     @Override
-    public Mat onCameraFrame(CvCameraViewFrame frame) {
+    public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // get current camera frame as OpenCV Mat object\
-
+        mRgba = inputFrame.rgba();
+        // Rotate mRgba 90 degrees
+//        Core.transpose(mRgba, mRgbaT);
+//        Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0, 0, 0);
+//        Core.flip(mRgba, mRgba, 1);
 
 //        // native call to process current camera frame
         if (viewFlag) {
             // Mat mat_rgba = frame.rgba();
-            Mat mat_gray = frame.rgba();
+            Mat mat_gray = mRgba;
             Mat fMap, vMap;
             //curFrame_rgba = mat_rgba;
             curFrame_gray = mat_gray;
@@ -180,12 +192,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             return curFrame_gray;
         } else {
 
-            //Mat mat_rgba = frame.rgba();
-            Mat mat_gray = frame.rgba();
-            //curFrame_rgba = mat_rgba;
-            curFrame_gray = mat_gray;
-            //prevFrame_rgba = mat_rgba;
-            //prevFrame_gray = mat_gray;
+            curFrame_gray = mRgba;
             SimpleLog.i("firstViewFlag: " + viewFlag);
             viewFlag = true;
 
@@ -198,7 +205,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     private native void coreFiltering(long mat_gray, int flag);
 
-    private native void initCL();
+    private native void initCL(int width, int height);
 
     /**
      * A native method that is implemented by the 'native-lib' native library,

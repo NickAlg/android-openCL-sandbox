@@ -42,7 +42,7 @@ int iSizeMultiple = 1;
 // global variables
 cl_context cxGPUContext;
 cl_kernel multiplicationKernel[MAX_GPU_COUNT];
-cl_command_queue commandQueue[MAX_GPU_COUNT];
+cl_command_queue mCommandQueue[MAX_GPU_COUNT];
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward

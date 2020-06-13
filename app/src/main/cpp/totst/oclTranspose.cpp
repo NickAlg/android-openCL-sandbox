@@ -34,7 +34,7 @@ cl_uint uiNumDevices;
 cl_device_id* cdDevices;
 cl_context cxGPUContext;
 cl_kernel ckKernel[MAX_GPU_COUNT];
-cl_command_queue commandQueue[MAX_GPU_COUNT];
+cl_command_queue mCommandQueue[MAX_GPU_COUNT];
 cl_program cpProgram;
 
 // forward declarations

@@ -5,6 +5,9 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp -static-openmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -static-openmp")
+
 # opencv configuration
 set( OpenCV_ANDROID_SDK ${CMAKE_SOURCE_DIR}/../ )
 set( OpenCV_DIR ${CMAKE_SOURCE_DIR}/../sdk/native/jni)

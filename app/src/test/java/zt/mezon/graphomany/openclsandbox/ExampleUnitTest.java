@@ -1,4 +1,4 @@
-package com.example.administrator.openclsandbox;
+package zt.mezon.graphomany.openclsandbox;
 
 import org.junit.Test;
 
