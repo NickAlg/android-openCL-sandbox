@@ -3,10 +3,10 @@
 
 #include <string>
 #include <time.h>
-#include <opencv2/opencv.hpp>
+#include "opencv2/opencv.hpp"
 #include <string.h>
 
-#include <OpenCLWrapper.h>
+#include "OpenCLWrapper.h"
 
 using namespace std;
 using namespace cv;

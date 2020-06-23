@@ -68,3 +68,6 @@ freeline_project_description.json
 
 /.idea/
 /sdk/sdk.iml
+/sdk/.cxx/cmake/
+/sdk/native/jni/
+/app/.cxx/

@@ -1,54 +1,46 @@
-package zt.mezon.graphomany.openclsandbox;
+package zt.mezon.graphomany.openclsandbox.ui.camera;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.WindowManager;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.don11995.log.SimpleLog;
-import zt.mezon.graphomany.openclsandbox.R;
 
-import org.jetbrains.annotations.NotNull;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
-import androidx.core.app.ActivityCompat;
+import java.lang.ref.WeakReference;
 
-//
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import zt.mezon.graphomany.openclsandbox.R;
+import zt.mezon.graphomany.openclsandbox.ui.mactivity.MainActivity;
+import zt.mezon.graphomany.openclsandbox.ui.mactivity.MainViewNDKHelper;
 
-public class MainActivity extends Activity implements CvCameraViewListener2 {
-    private static final int CAMERA_PERMISSION_REQUEST = 1;
-
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-    }
+public class CameraHomeFragment extends Fragment implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     Mat mRgba;
     Mat mRgbaF;
     Mat mRgbaT;
+    private CameraHomeViewModel mCameraHomeViewModel;
     private CameraBridgeViewBase mOpenCvCameraView;
     private Mat curFrame_gray;
-    private Mat curFrame_rgba;
-    private Mat prevFrame_gray;
-    private Mat prevFrame_rgba;
-    private Mat referenceFrame;
     private Button captureButton;
     private Button infoButton;
     private boolean viewFlag = false;
     private int mapFlag = 0;
-    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(getContext()) {
         @Override
         public void onManagerConnected(int status) {
             if (status == LoaderCallbackInterface.SUCCESS) {
@@ -63,34 +55,32 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             }
         }
     };
+    private WeakReference<MainViewNDKHelper> mHelper;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        SimpleLog.i("called onCreate");
-        super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Permissions for Android 6+
-        ActivityCompat.requestPermissions(
-                this,
-                new String[]{Manifest.permission.CAMERA},
-                CAMERA_PERMISSION_REQUEST
-        );
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.ocvsobelrgb);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+// If need no parameters
+//        mCameraHomeViewModel =
+//                new ViewModelProvider(this).get(CameraHomeViewModel.class);
+//
+        mCameraHomeViewModel =
+                new ViewModelProvider(this, new ViewModelProvider.Factory() {
+                    @NonNull
+                    @Override
+                    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                        return (T) new CameraHomeViewModel(getContext());
+                    }
+                }
+                ).get(CameraHomeViewModel.class);
 
-        SimpleLog.enableAllLogs();
-        SimpleLog.setPrintReferences(true);
 
-        mOpenCvCameraView = findViewById(R.id.main_surface);
-
+        View root = inflater.inflate(R.layout.fragment_clcam, container, false);
+        infoButton = root.findViewById(R.id.btn_info);
+        captureButton = root.findViewById(R.id.btn_takepicture);
+        mOpenCvCameraView = root.findViewById(R.id.main_surface);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-
         mOpenCvCameraView.setCvCameraViewListener(this);
-
-        captureButton = findViewById(R.id.btn_takepicture);
-        infoButton = findViewById(R.id.btn_info);
-
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,16 +88,14 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
                 mapFlag = (mapFlag == 1) ? 0 : 1;
             }
         });
-
-        infoButton.setOnClickListener(new View.OnClickListener() {
+        mOpenCvCameraView.setCameraPermissionGranted();
+        mCameraHomeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
-            public void onClick(View v) {
-                viewFlag = false;
-//                Intent intent = new Intent(MainActivity.this, AboutMe.class);
-//                startActivity(intent);
+            public void onChanged(@Nullable String s) {
+                infoButton.setText(s);
             }
         });
-
+        return root;
     }
 
     @Override
@@ -115,7 +103,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
             SimpleLog.i("Internal OpenCV library not found. Using OpenCV Manager for initialization");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallback);
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, getContext(), mLoaderCallback);
         } else {
             SimpleLog.i("OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
@@ -139,41 +127,25 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions,
-                                           @NotNull int[] grantResults) {
-        if (requestCode == CAMERA_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mOpenCvCameraView.setCameraPermissionGranted();
-            } else {
-                String message = "Camera permission was not granted";
-                SimpleLog.e(message);
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-            }
-        } else {
-            SimpleLog.e("Unexpected permission request");
-        }
-    }
-
-    //
-    @Override
     public void onCameraViewStarted(int width, int height) {
-        initCL( width,  height);
+        mHelper = new WeakReference<MainViewNDKHelper>(((MainActivity) getActivity()).getNDKHelper());
+
         SimpleLog.i("OpenCL is initialized");
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mRgbaF = new Mat(height, width, CvType.CV_8UC4);
         mRgbaT = new Mat(width, width, CvType.CV_8UC4);
-
     }
 
     @Override
     public void onCameraViewStopped() {
+
     }
 
-    //
     @Override
-    public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         // get current camera frame as OpenCV Mat object\
         mRgba = inputFrame.rgba();
+//        return inputFrame.gray();
         // Rotate mRgba 90 degrees
 //        Core.transpose(mRgba, mRgbaT);
 //        Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0, 0, 0);
@@ -186,7 +158,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             Mat fMap, vMap;
             //curFrame_rgba = mat_rgba;
             curFrame_gray = mat_gray;
-            coreFiltering(curFrame_gray.getNativeObjAddr(), mapFlag);
+            mHelper.get().coreFiltering(curFrame_gray.getNativeObjAddr(), mapFlag);
             SimpleLog.i("viewFlag: " + viewFlag);
 
             return curFrame_gray;
@@ -200,16 +172,5 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             return curFrame_gray;
         }
 
-
     }
-
-    private native void coreFiltering(long mat_gray, int flag);
-
-    private native void initCL(int width, int height);
-
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
 }

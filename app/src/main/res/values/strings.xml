@@ -3,4 +3,9 @@
     <string name="string_capture">Capture</string>
     <string name="string_information">Info</string>
     <string name="string_textview"> This is EdgeCam App </string>
+    <string name="title_activity_main2">MainActivity</string>
+    <string name="title_camera">Camera</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_othercalc">Misc Calc</string>
+    <string name="tmp">This is camera fragment</string>
 </resources>

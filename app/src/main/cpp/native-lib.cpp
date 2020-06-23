@@ -107,7 +107,7 @@ const char *getErrorString(cl_int error) {
     }
 extern "C" JNIEXPORT jstring
 JNICALL
-Java_zt_mezon_graphomany_openclsandbox_MainActivity_stringFromJNI(
+Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_stringFromJNI(
     JNIEnv *env,
     jobject /* this */) {
 //  CLRuntime *tmp = new CLRuntime();
@@ -129,10 +129,10 @@ Java_zt_mezon_graphomany_openclsandbox_MainActivity_stringFromJNI(
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_zt_mezon_graphomany_openclsandbox_MainActivity_coreFiltering(JNIEnv *env,
-                                                                        jobject thiz,
-                                                                        jlong mat_gray,
-                                                                        jint flag) {
+Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_coreFiltering(JNIEnv *env,
+                                                                                    jobject thiz,
+                                                                                    jlong mat_gray,
+                                                                                    jint flag) {
 
   clock_t begin_total = clock();
   clock_t begin = clock();
@@ -289,10 +289,10 @@ Java_zt_mezon_graphomany_openclsandbox_MainActivity_coreFiltering(JNIEnv *env,
 
 }extern "C"
 JNIEXPORT void JNICALL
-Java_zt_mezon_graphomany_openclsandbox_MainActivity_initCL(JNIEnv *env,
-                                                                 jobject thiz,
-                                                                 jint width,
-                                                                 jint height)  {
+Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_initCL(JNIEnv *env,
+                                                                             jobject thiz,
+                                                                             jint width,
+                                                                             jint height)  {
   cl_int error;
   cl_int status = CL_SUCCESS;
   NNM::OpenCLSymbolsOperator::createOpenCLSymbolsOperatorSingleInstance();
