@@ -20,9 +20,16 @@ import androidx.navigation.ui.NavigationUI;
 import zt.mezon.graphomany.openclsandbox.R;
 
 public class MainActivity extends AppCompatActivity implements IMainViewNDKNavigator, IMainMVPView {
+    private static final int CAMERA_PERMISSION_REQUEST = 1;
     private MainViewNDKHelper mNDKHelper;
     private IMainActivityPresenter mPresenter;
-    private static final int CAMERA_PERMISSION_REQUEST = 1;
+    private NavController mNavController;
+    private AppBarConfiguration mAppBarConfiguration;
+    private BottomNavigationView mBottomNavigationView;
+
+    public NavController getNavController() {
+        return mNavController;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +46,18 @@ public class MainActivity extends AppCompatActivity implements IMainViewNDKNavig
         setContentView(R.layout.activity_main);
         mNDKHelper = new MainViewNDKHelper(this);
         mPresenter = new MainActivityPresenterImpl(this);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
+        mBottomNavigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_camera, R.id.navigation_dashboard, R.id.navigation_othercalc)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
-        mNDKHelper.initCL(0,0);
+        mNavController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(mBottomNavigationView, mNavController);
+        mNDKHelper.initCL(0, 0);
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions,
                                            @NotNull int[] grantResults) {
@@ -64,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewNDKNavig
             SimpleLog.e("Unexpected permission request");
         }
     }
+
     public MainViewNDKHelper getNDKHelper() {
         return mNDKHelper;
     }

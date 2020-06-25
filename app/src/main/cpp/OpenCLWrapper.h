@@ -11,7 +11,7 @@
 
 #include <android_log.h>
 
-#define LOG_TAG " CLWRAPP "
+//#define LOG_TAG " CLWRAPP "
 
 #define MNN_ASSERT(x)                                            \
     {                                                            \

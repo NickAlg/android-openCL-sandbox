@@ -12,12 +12,12 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <supports-screens
-        android:anyDensity="true"
-        android:largeScreens="true"
-        android:normalScreens="true"
-        android:resizeable="true"
-        android:smallScreens="true" />
+    <!--    <supports-screens-->
+    <!--        android:anyDensity="true"-->
+    <!--        android:largeScreens="true"-->
+    <!--        android:normalScreens="true"-->
+    <!--        android:resizeable="true"-->
+    <!--        android:smallScreens="true" />-->
 
     <uses-feature
         android:name="android.hardware.camera.autofocus"
@@ -25,12 +25,7 @@
     <uses-feature
         android:name="android.hardware.camera.front"
         android:required="false" />
-    <uses-feature
-        android:name="android.hardware.camera.front.autofocus"
-        android:required="false" />
-    <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true" />
+
 
     <application
         android:name=".App"

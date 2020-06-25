@@ -20,23 +20,21 @@ import java.lang.ref.WeakReference;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import zt.mezon.graphomany.openclsandbox.R;
+import zt.mezon.graphomany.openclsandbox.ui.base.BaseFragment;
 import zt.mezon.graphomany.openclsandbox.ui.mactivity.MainActivity;
 import zt.mezon.graphomany.openclsandbox.ui.mactivity.MainViewNDKHelper;
 
-public class CameraHomeFragment extends Fragment implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class CameraHomeFragment extends BaseFragment implements CameraBridgeViewBase.CvCameraViewListener2 {
 
-    Mat mRgba;
-    Mat mRgbaF;
-    Mat mRgbaT;
+    private Mat mRgba;
+    private Mat mRgbaF;
+    private Mat mRgbaT;
     private CameraHomeViewModel mCameraHomeViewModel;
     private CameraBridgeViewBase mOpenCvCameraView;
-    private Mat curFrame_gray;
-    private Button captureButton;
     private Button infoButton;
     private boolean viewFlag = false;
     private int mapFlag = 0;
@@ -77,7 +75,7 @@ public class CameraHomeFragment extends Fragment implements CameraBridgeViewBase
 
         View root = inflater.inflate(R.layout.fragment_clcam, container, false);
         infoButton = root.findViewById(R.id.btn_info);
-        captureButton = root.findViewById(R.id.btn_takepicture);
+        Button captureButton = root.findViewById(R.id.btn_takepicture);
         mOpenCvCameraView = root.findViewById(R.id.main_surface);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
@@ -148,13 +146,15 @@ public class CameraHomeFragment extends Fragment implements CameraBridgeViewBase
 //        return inputFrame.gray();
         // Rotate mRgba 90 degrees
 //        Core.transpose(mRgba, mRgbaT);
-//        Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0, 0, 0);
-//        Core.flip(mRgba, mRgba, 1);
+//        Imgproc.resize(mRgba, mRgbaF, mRgbaF.size(), 0, 0, 0);
+//        Core.flip(mRgba, mRgbaF, -1);
 
 //        // native call to process current camera frame
+        Mat curFrame_gray;
         if (viewFlag) {
             // Mat mat_rgba = frame.rgba();
-            Mat mat_gray = mRgba;
+//            Mat mat_gray =  mRgba;
+            Mat mat_gray = inputFrame.rgba();
             Mat fMap, vMap;
             //curFrame_rgba = mat_rgba;
             curFrame_gray = mat_gray;
