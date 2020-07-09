@@ -12,12 +12,12 @@ using namespace cv;
 
 CLRuntime *m_runtime = new CLRuntime();
 
-
+size_t ARRAY_SIZE = 20;
 extern "C" JNIEXPORT jstring
 JNICALL
-Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
+Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_takeClDataStringFromJNI(
+    JNIEnv *env,
+    jobject /* this */) {
     std::string hello;
 ////    for (int i = 0; i <tmp->deviceListSize ; ++i) {
 //  int itmp = tmp->init();
@@ -281,8 +281,8 @@ Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_initCL(JNI
     cl_int err = 0;
     m_runtime->mProgram =
             clCreateProgramWithSource(m_runtime->m_context,
-                                      (cl_uint) CL_SOBEL_COLOR_SIZE,
-                                      CL_SOBEL_COLOR,
+                                      (cl_uint) CL_TST_KERNELS_SIZE,
+                                      CL_TST_KERNELS,
                                       NULL,
                                       &err);
     if (err != CL_SUCCESS) {
@@ -311,25 +311,32 @@ Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_initCL(JNI
                    " There was a build error, but there is insufficient space allocated to show the build logs. \n");
         } else {
             LOG_W2(ANDROID_LOG_ERROR, " There was a build error, Build error:. %s \n", log);
-
+  
         }
     }
-    if (error != CL_SUCCESS) {
-        LOGD("Failed to create program");
-    } else {
-        LOGD("Success to create program");
-    }
-    m_runtime->mKErnelSobelFilter = clCreateKernel(m_runtime->mProgram, "sobel_filter_color",
-                                                   &error);
-    char *program_log;
-    const char options[] = "";
-    size_t log_size;
-
-    error = clBuildProgram(m_runtime->mProgram, 1, &m_runtime->m_device, options, NULL, NULL);
-
-    if (error != CL_SUCCESS) {
-        size_t len;
-        char buffer[8 * 1024];
+  if (error != CL_SUCCESS) {
+    LOGD("Failed to create program");
+  } else {
+    LOGD("Success to create program");
+  }
+  m_runtime->mKErnelSobelFilter = clCreateKernel(m_runtime->mProgram, "sobel_filter_color",
+                                                 &error);
+  CHECK_CL_SUCCESS(error,
+                   "Failed to  create sobel_filter_color");
+  m_runtime->mKernelHelloW = clCreateKernel(m_runtime->mProgram, "hello_kernel",
+                                            &error);
+  CHECK_CL_SUCCESS(error,
+                   "Failed to  create hello_kernel");
+  
+  char *program_log;
+  const char options[] = "";
+  size_t log_size;
+  
+  error = clBuildProgram(m_runtime->mProgram, 1, &m_runtime->m_device, options, NULL, NULL);
+  
+  if (error != CL_SUCCESS) {
+    size_t len;
+    char buffer[8 * 1024];
 
         LOGD("Error: Failed to build program executable!\n");
         clGetProgramBuildInfo(m_runtime->mProgram,
@@ -338,13 +345,65 @@ Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_initCL(JNI
                               sizeof(buffer),
                               buffer,
                               &len);
-        LOGD("build program %s\n", buffer);
-    }
-
-    if (error != CL_SUCCESS) {
-        LOGD("Failed to build program");
-    } else {
-        LOGD("Success to build program");
-    }
-
+    LOGD("build program %s\n", buffer);
+  }
+  
+  if (error != CL_SUCCESS) {
+    LOGD("Failed to build program");
+  } else {
+    LOGD("Success to build program");
+  }
+  
+}
+bool CreateMemObjects(cl_context context, cl_mem memObjects[3],
+                      float *a, float *b) {
+  memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                 sizeof(float) * ARRAY_SIZE, a, NULL);
+  memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                 sizeof(float) * ARRAY_SIZE, b, NULL);
+  memObjects[2] = clCreateBuffer(context, CL_MEM_READ_WRITE,
+                                 sizeof(float) * ARRAY_SIZE, NULL, NULL);
+  return true;
+}
+extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_zt_mezon_graphomany_openclsandbox_ui_mactivity_MainViewNDKHelper_takeTestClDataArrayFromJNI(
+    JNIEnv *env,
+    jobject thiz,
+    jfloatArray a,
+    jfloatArray b,
+    jfloatArray result) {
+  cl_mem memObjects[3] = {0, 0, 0};
+  
+  jsize size = env->GetArrayLength(a);
+  if (ARRAY_SIZE != size) { ARRAY_SIZE = size; }
+  jfloat *fla = env->GetFloatArrayElements(a, 0);
+  jfloat *flb = env->GetFloatArrayElements(b, 0);
+  jfloat arrayRes[ARRAY_SIZE];
+  
+  if (!CreateMemObjects(m_runtime->m_context, memObjects, fla, flb)) {
+    return result;
+  }
+  // set the kernel data and execute the kernel
+  CHECK_CL_SUCCESS(clSetKernelArg(m_runtime->mKernelHelloW, 0, sizeof(cl_mem), &memObjects[0]),
+                   "Failed to clSetKernelArg 0");
+  CHECK_CL_SUCCESS(clSetKernelArg(m_runtime->mKernelHelloW, 1, sizeof(cl_mem), &memObjects[1]),
+                   "Failed to clSetKernelArg 1");
+  CHECK_CL_SUCCESS(clSetKernelArg(m_runtime->mKernelHelloW, 2, sizeof(cl_mem), &memObjects[2]),
+                   "Failed to clSetKernelArg 2");
+  
+  size_t globalWorkSize[1] = {ARRAY_SIZE};
+  size_t localWorkSize[1] = {1};
+  
+  CHECK_CL_SUCCESS(clEnqueueNDRangeKernel(m_runtime->m_cmd_queue, m_runtime->mKernelHelloW, 1, NULL,
+                                          globalWorkSize, localWorkSize,
+                                          0, NULL, NULL), "Failed to clEnqueueNDRangeKernel");
+  
+  // read the execution results and release OpenCL resources
+  CHECK_CL_SUCCESS(clEnqueueReadBuffer(m_runtime->get_command_queue(), memObjects[2], CL_TRUE,
+                                       0, ARRAY_SIZE * sizeof(float), arrayRes,
+                                       0, NULL, NULL), "Failed to clEnqueueReadBuffer(");
+  
+  env->SetFloatArrayRegion(result, 0, ARRAY_SIZE, arrayRes);
+  return result;
 }

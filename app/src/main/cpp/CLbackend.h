@@ -188,7 +188,7 @@ public:
     cl_uint retNumPlatforms;
     cl_program mProgram = NULL;
     cl_kernel mKErnelSobelFilter;
-
+  cl_kernel mKernelHelloW;
 
     cl_platform_id listPlatform;
     cl_platform_id *listPlatforms;
@@ -205,7 +205,6 @@ public:
 
     std::string getInfoSt2(int j) const;
 
-    int init();
 
     class TimelineEntry {
     public:

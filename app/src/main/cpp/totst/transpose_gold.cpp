@@ -15,24 +15,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // export C interface
-extern "C" 
-void computeGold( float* reference, float* idata, 
-                  const unsigned int size_x, const unsigned int size_y );
+extern "C"
+void computeGold(float *reference, float *idata,
+                 const unsigned int size_x, const unsigned int size_y);
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Compute reference data set
 ////////////////////////////////////////////////////////////////////////////////
 void
-computeGold( float* reference, float* idata, 
-            const unsigned int size_x, const unsigned int size_y ) 
-{
-    // transpose matrix
-    for( unsigned int y = 0; y < size_y; ++y) 
-    {
-        for( unsigned int x = 0; x < size_x; ++x) 
-        {
-            reference[(x * size_y) + y] = idata[(y * size_x) + x];
-        }
-    }  
+computeGold(float *reference, float *idata,
+            const unsigned int size_x, const unsigned int size_y) {
+  // transpose matrix
+  for (unsigned int y = 0; y < size_y; ++y) {
+    for (unsigned int x = 0; x < size_x; ++x) {
+      reference[(x * size_y) + y] = idata[(y * size_x) + x];
+    }
+  }
 }
 

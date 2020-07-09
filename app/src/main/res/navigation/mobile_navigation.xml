@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_othercalc"
-        android:name="zt.mezon.graphomany.openclsandbox.ui.notifications.NotificationsFragment"
+        android:name="zt.mezon.graphomany.openclsandbox.ui.testcalc.TestCalcFragment"
         android:label="@string/title_othercalc"
         tools:layout="@layout/fragment_othercalc" />
 </navigation>

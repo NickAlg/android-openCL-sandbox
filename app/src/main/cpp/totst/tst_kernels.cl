@@ -56,3 +56,65 @@ __kernel void copy(__read_only image2d_t srcImg,
         write_imagef(dstImg, outImageCoord, outColor);
     }
 }
+__kernel void hello_kernel(__global const float *a,
+                           __global const float *b,
+                           __global float *result)
+{
+    int gid = get_global_id(0);
+
+    result[gid] = a[gid] + b[gid];
+}
+
+__kernel
+        void grad_smootch(__global uchar
+        *src_buffer,
+                __global
+        uchar *grad_buffer,
+                __global
+        uchar *dst_buffer,
+        const int thresh,
+        const int radius)
+{
+        //const int gidx = get_global_id(0);
+        //const int gidy = get_global_id(1);
+        int work_width = get_global_size(0);
+        int work_height = get_global_size(1);
+        int bokx = get_global_id(0);
+        int boky = get_global_id(1);
+        //size_t lidx = get_local_id(0);
+        int dst_pixel_id = boky * work_width + bokx;
+        int grad_data = (int)grad_buffer[dst_pixel_id];
+
+        if (grad_data < thresh )
+{
+        int sumWeight = 0;
+        int sumC0 = 0;
+
+        int compute_up_range = min(boky, radius);
+        int compute_down_range = min(work_height - 1 - boky, radius);
+        int compute_left_range = min(bokx, radius);
+        int compute_right_range = min(work_width - 1 - bokx, radius);
+        for (int kr = -compute_up_range; kr <= compute_down_range; kr+=2)
+{
+        int offset = (boky + kr) * work_width + bokx;
+        for (int kc = -compute_left_range; kc <= compute_right_range; kc+=2)
+{
+        if ( abs(src_buffer[dst_pixel_id] - src_buffer[offset + kc]) < 10 )
+{
+        sumC0 +=  (int)src_buffer[offset + kc];
+        sumWeight++;
+}
+}
+}
+        if (sumWeight != 0)
+{
+        dst_buffer[dst_pixel_id] = (uchar)(sumC0 / sumWeight);
+}
+
+}
+        else
+{
+        dst_buffer[dst_pixel_id] = src_buffer[dst_pixel_id];
+}
+
+}

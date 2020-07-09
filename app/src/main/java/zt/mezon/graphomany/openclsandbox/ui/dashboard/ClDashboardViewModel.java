@@ -16,7 +16,7 @@ public class ClDashboardViewModel extends ViewModel {
     public ClDashboardViewModel( WeakReference<MainViewNDKHelper> helperWeakReferenceelper) {
         mHelper =helperWeakReferenceelper;
         mText = new MutableLiveData<>();
-        String s = mHelper.get().stringFromJNI();
+        String s = mHelper.get().takeClDataStringFromJNI();
         SimpleLog.fd(s);
         mText.setValue(s);
     }
